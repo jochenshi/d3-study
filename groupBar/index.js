@@ -23,7 +23,7 @@ class GroupBar {
     //初始化坐标轴
     initAxis () {
         //主横坐标
-        this.x0 = d3.scaleBand().rangeRound([0, this.width]).paddingInner(0.1);
+        this.x0 = d3.scaleBand().rangeRound([0, this.width]).paddingInner(0.05);
         //具体的细分的单个部分
         this.x1 = d3.scaleBand().padding(0.1);
         this.y = d3.scaleLinear().range([this.height, 0]);
@@ -39,6 +39,7 @@ class GroupBar {
             .enter()
             .append("g")
             .attr("transform", (d) => {
+                console.log(this.x0(d.State));
                 return "translate(" + this.x0(d.State) + ", 0)"
             })
             .selectAll("rect")
@@ -63,6 +64,44 @@ class GroupBar {
         this.mainContent.append("g")
             .attr("class", "axis")
             .call(d3.axisLeft(this.y).ticks(null, "s"))
+            .append("text")
+            .attr("x", 2)
+            .attr("y", this.y(this.y.ticks().pop()) + 0.5)
+            .attr("dy", "0.32em")
+            .attr("fill", "#000")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "start")
+            .text("yAxis")
+    }
+
+    setLegend () {
+        this.legend = this.mainContent.append("g")
+            .attr("font-size", 10)
+            .attr("text-anchor", "end")
+            .selectAll("g")
+            .data(this.keys.slice().reverse())
+            .enter()
+            .append("g")
+            .attr("transform", (d, i) => {
+                return "translate(0, " + i*20 + ")"
+            });
+
+        this.legend.append("rect")
+            .attr("x", this.width - 19)
+            .attr("width", 19)
+            .attr("height", 19)
+            .attr("fill", (d, i) => {
+                return this.color(i)
+            });
+
+        this.legend.append("text")
+            .attr("x", this.width - 24)
+            .attr("y", 9.5)
+            .attr("dy", "0.32em")
+            .text((d) => {
+                return d
+            })
+
     }
 
     _render (data) {
@@ -94,6 +133,7 @@ class GroupBar {
             this.data = data;
             this.keys = keys;
             this.generateMainContent();
+            this.setLegend();
         })
     }
 }
