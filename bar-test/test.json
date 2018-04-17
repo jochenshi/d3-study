@@ -1,0 +1,29 @@
+{
+    "name": "test data",
+    "value": [
+        {
+            "text": "wwww",
+            "value": 10
+        },
+        {
+            "text": "text1",
+            "value": 10
+        },
+        {
+            "text": "text2",
+            "value": 20
+        },
+        {
+            "text": "text3",
+            "value": 30
+        },
+        {
+            "text": "text4",
+            "value": 30
+        },
+        {
+            "text": "text5",
+            "value": 100
+        }
+    ]
+}
