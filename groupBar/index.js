@@ -16,7 +16,7 @@ class GroupBar {
 
     initParams () {
         this.width = 500 - this.config.margin.left - this.config.margin.right;
-        this.height = 390 - this.config.margin.top - this.config.margin.bottom;
+        this.height = 400 - this.config.margin.top - this.config.margin.bottom;
         this.initAxis();
     }
 
@@ -39,7 +39,6 @@ class GroupBar {
             .enter()
             .append("g")
             .attr("transform", (d) => {
-                console.log(this.x0(d.State));
                 return "translate(" + this.x0(d.State) + ", 0)"
             })
             .selectAll("rect")
@@ -129,7 +128,7 @@ class GroupBar {
                 return d3.max(keys, (k) => {
                     return d[k]
                 })
-            })]);
+            })]).nice();
             this.data = data;
             this.keys = keys;
             this.generateMainContent();

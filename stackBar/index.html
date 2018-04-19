@@ -5,18 +5,17 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>stackBar</title>
     <script src="../d3.js"></script>
-    <link rel="stylesheet" href="./index.css">
+    <script src="index.js"></script>
 </head>
 <body>
-    <div class="group-bar">
-        <svg style="width: 500px; height: 400px;"></svg>
+    <div class="stack-bar">
+        <svg style="width: 600px; height: 500px;"></svg>
     </div>
 </body>
-<script src="index.js"></script>
 <script>
-    let project = new GroupBar(".group-bar svg");
-    window.project1 = project;
+    let target2 = new StackBar(".stack-bar svg");
+    window.target2 = target2;
 </script>
 </html>
