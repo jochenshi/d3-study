@@ -117,6 +117,7 @@ class GroupBar {
             }
             return d
         }, (error, data) => {
+            console.log(data);
             let keys = data.columns.slice(1);
             this.x0.domain(data.map((d) => {
                 return d.State;

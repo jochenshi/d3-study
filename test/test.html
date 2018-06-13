@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="oxxo.studio">
+  <meta name="copyright" content="oxxo.studio">
+  <title>SVG D3.js - 座標軸 ( Axis ) - demo 5</title>
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+  <svg id="s">
+  </svg>
+  <script>
+  var data = [{
+    x: 0,
+    y: 1.89
+  }, {
+    x: 1,
+    y: 2.77
+  }, {
+    x: 2,
+    y: 0.86
+  }, {
+    x: 3,
+    y: 3.45
+  }, {
+    x: 4,
+    y: 4.13
+  }, {
+    x: 5,
+    y: 3.59
+  }, {
+    x: 6,
+    y: 2.33
+  }, {
+    x: 7,
+    y: 3.79
+  }, {
+    x: 8,
+    y: 2.61
+  }, {
+    x: 9,
+    y: 2.15
+  }];
+
+  var width = 240,
+    height = 120;
+
+  var s = d3.select('#s');
+
+  s.attr({
+    'width': '300',
+    'height': '180'
+  });
+
+  var scaleX = d3.scaleLinear()
+    .range([0, width])
+    .domain([0, 9]);
+
+  var scaleY = d3.scaleLinear()
+    .range([height, 0])
+    .domain([0, 5]); 
+
+  var line = d3.line()
+    .x(function(d) {
+      return scaleX(d.x);
+    }).y(function(d) {
+      return scaleY(d.y);
+    });
+
+  var axisX = d3.axisBottom(scaleX)
+    .ticks(10)
+    .tickFormat(function(d){return d+'n';});
+
+  var axisY = d3.axisLeft(scaleY)
+    .ticks(5)
+    .tickFormat(function(d){return d+'%';});
+
+  var axisXGrid = d3.axisBottom(scaleX)
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-height,0);
+
+  var axisYGrid = d3.axisLeft(scaleY)
+    .ticks(10)
+    .tickFormat("")
+    .tickSize(-width,0);
+
+  s.append('path')
+    .attr({
+      'd': line(data),
+      'stroke': '#09c',
+      'fill': 'none',
+      'transform':'translate(35,20)'  //折線圖也要套用 translate
+    });
+
+  // Axis Grid line
+  s.append('g')
+   .call(axisXGrid)
+   .attr("fill", "none")
+   .attr("stroke", "rgba(0,0,0,.1)")
+   .attr("transform", 'translate(35,'+(height+20)+')' );
+
+  s.append('g')
+   .call(axisYGrid)
+   .attr("fill", "none")
+   .attr("stroke", "rgba(0,0,0,.1)")
+   .attr("transform", 'translate(35,20)' );
+
+  // Axis 
+  s.append('g')
+   .call(axisX)
+   .attr("fill", "none")
+   .attr("stroke", "#000")
+   .attr("transform", 'translate(35,'+(height+20)+')' )
+   .selectAll('text')
+    .style({
+    'font-size':'11px'
+   });
+
+  s.append('g')
+   .call(axisY)
+   .attr("fill", "none")
+   .attr("stroke", "#000")
+   .attr("transform", 'translate(35,20)' )
+   .selectAll('text')
+  .style({
+    'font-size':'10px'
+   });
+  </script>
+</body>
+
+</html>

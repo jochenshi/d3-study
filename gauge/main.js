@@ -1,5 +1,5 @@
 class GaugeBoard {
-    constructor (element, configs) {
+    constructor(element, configs) {
         this.ele = d3.select(element);
         let defaultConfig = {
             size: 200,
@@ -17,24 +17,26 @@ class GaugeBoard {
         this.drawPointer();
 
     }
+
     //init some params
-    initParams () {
+    initParams() {
         this.config.size = this.config.size * 0.9;
         this.config.radius = this.config.size * 0.97 / 2;
         this.config.cx = this.config.size / 2;
         this.config.cy = this.config.size / 2;
         this.config.range = this.config.max - this.config.min;
         this.config.yellowRange = [
-            {from : this.config.min + this.config.range*0.75, to: this.config.min + this.config.range*0.9}
+            {from: this.config.min + this.config.range * 0.75, to: this.config.min + this.config.range * 0.9}
         ];
         this.config.redRange = [
-            {from : this.config.min + this.config.range*0.9, to: this.config.max}
+            {from: this.config.min + this.config.range * 0.9, to: this.config.max}
         ];
 
         this.fontSize = Math.round(this.config.size / 16);
     }
+
     // generate the main content
-    generateMain () {
+    generateMain() {
         this.mainContent = this.ele.append("svg")
             .attr("class", "gauge-class")
             .attr("width", this.config.size)
@@ -51,15 +53,15 @@ class GaugeBoard {
         this.mainContent.append("circle")
             .attr("cx", this.config.cx)
             .attr("cy", this.config.cy)
-            .attr("r", 0.9*this.config.radius)
+            .attr("r", 0.9 * this.config.radius)
             .style("fill", "#fff")
             .style("stroke", "#e0e0e0")
             .style("stroke-width", "2");
 
         this.mainContent.append("text")
             .attr("x", this.config.cx)
-            .attr("y", this.config.cy/2 + this.fontSize/2)
-            .attr("dy", this.fontSize/2)
+            .attr("y", this.config.cy / 2 + this.fontSize / 2)
+            .attr("dy", this.fontSize / 2)
             .attr("text-anchor", "middle")
             .text(this.config.label)
             .attr("font-size", this.fontSize)
@@ -68,25 +70,25 @@ class GaugeBoard {
 
     }
 
-    valueToRotate (value) {
+    valueToRotate(value) {
         return (value - this.config.min) / this.config.range * 270 - 45;
     }
 
     //pointer position calculate
-    valueToPoint (value, factor) {
+    valueToPoint(value, factor) {
         let point = this.valueToPosition(value, factor);
         point.x -= this.config.cx;
         point.y -= this.config.cy;
         return point;
     }
 
-    calculateDegree (value) {
+    calculateDegree(value) {
         let initRotate = this.valueToRotate(value);
         return initRotate * Math.PI / 180;
     }
 
     //将角度转换为相应的坐标
-    valueToPosition (value, factor) {
+    valueToPosition(value, factor) {
         return {
             x: this.config.cx - this.config.radius * factor * Math.cos(this.calculateDegree(value)),
             y: this.config.cy - this.config.radius * factor * Math.sin(this.calculateDegree(value))
@@ -94,7 +96,7 @@ class GaugeBoard {
     }
 
     //绘制深色区域的公共方法
-    drawBand (start, end, color) {
+    drawBand(start, end, color) {
         if (start >= end) {
             return
         }
@@ -111,15 +113,19 @@ class GaugeBoard {
     }
 
     //绘制指针区域的具体的方法
-    drawPointer () {
+    drawPointer() {
         this.pointerContainer = this.mainContent
             .append("g").attr("class", "pointerContainer");
         let midValue = (this.config.min + this.config.max) / 2;
         let pointerPath = this.buildPointerPath(midValue);
 
         let pointerLine = d3.line()
-            .x((d) => {return d.x})
-            .y((d) => {return d.y})
+            .x((d) => {
+                return d.x
+            })
+            .y((d) => {
+                return d.y
+            })
             .curve(d3.curveBasis);
 
         this.pointerContainer.selectAll("path")
@@ -130,7 +136,7 @@ class GaugeBoard {
             .attr("fill", "#dc3912")
             .attr("stroke", "c63310")
             .attr("fill-opacity", 0.7);
-            //.attr("transform", "translate(" + this.config.cx + "," + this.config.cy + ")")
+        //.attr("transform", "translate(" + this.config.cx + "," + this.config.cy + ")")
 
         this.pointerContainer.append("circle")
             .attr("cx", this.config.cx)
@@ -145,8 +151,8 @@ class GaugeBoard {
             .enter()
             .append("text")
             .attr("x", this.config.cx)
-            .attr("y", this.config.size - this.config.cy/4 - this.fontSize)
-            .attr("dy", this.fontSize/2)
+            .attr("y", this.config.size - this.config.cy / 4 - this.fontSize)
+            .attr("dy", this.fontSize / 2)
             .attr("text-anchor", "middle")
             .attr("font-size", this.fontSize)
             .attr("fill", "#000")
@@ -157,14 +163,14 @@ class GaugeBoard {
     }
 
     //绘制指针区域的转换值的方法
-    buildPointerPath (value) {
+    buildPointerPath(value) {
         let delta = this.config.range / 13;
         let head = this.valueToPoint(value, 0.85);
         let head1 = this.valueToPoint(value - delta, 0.12);
         let head2 = this.valueToPoint(value + delta, 0.12);
 
         //将值变动半圈的大小，实现指针的尾部的部分
-        let tailValue = value + (this.config.range * (1/(270/360)) / 2);
+        let tailValue = value + (this.config.range * (1 / (270 / 360)) / 2);
         let tail = this.valueToPoint(tailValue, 0.28);
         let tail1 = this.valueToPoint(tailValue - delta, 0.12);
         let tail2 = this.valueToPoint(tailValue + delta, 0.12);
@@ -173,7 +179,7 @@ class GaugeBoard {
     }
 
     //根据新的值转动指针的方法
-    redraw (value, transitionDuration) {
+    redraw(value, transitionDuration) {
         let pointerContainer = this.mainContent.select(".pointerContainer");
         pointerContainer.selectAll("text")
             .text(Math.round(value));
@@ -184,9 +190,9 @@ class GaugeBoard {
             .attrTween("transform", () => {
                 let pointerValue = value;
                 if (value > this.config.max) {
-                    pointerValue = this.config.max + 0.02*this.config.range;
+                    pointerValue = this.config.max + 0.02 * this.config.range;
                 } else if (value < this.config.min) {
-                    pointerValue = this.config.min - 0.02*this.config.range;
+                    pointerValue = this.config.min - 0.02 * this.config.range;
                 }
                 let targetRotation = this.valueToRotate(pointerValue) - 90;
                 let currentRotation = this.currentRotation || targetRotation;
@@ -199,13 +205,13 @@ class GaugeBoard {
     }
 
     //绘制刻度线的方法
-    drawMark () {
+    drawMark() {
         let majorDelta = this.config.range / (this.config.majorTicks - 1);
         for (let i = this.config.min; i <= this.config.max; i += majorDelta) {
             let minorDelta = majorDelta / this.config.minorTicks;
             //大刻度线之间的小的刻度线
             for (let j = i + minorDelta; j < Math.min(majorDelta + i, this.config.max); j += minorDelta) {
-                let point1 = this.valueToPosition(j , 0.75);
+                let point1 = this.valueToPosition(j, 0.75);
                 let point2 = this.valueToPosition(j, 0.85);
                 this.mainContent.append("line")
                     .attr("x1", point1.x)
@@ -216,7 +222,7 @@ class GaugeBoard {
                     .attr("stroke-width", 1)
             }
 
-            let point1 = this.valueToPosition(i , 0.7);
+            let point1 = this.valueToPosition(i, 0.7);
             let point2 = this.valueToPosition(i, 0.85);
             this.mainContent.append("line")
                 .attr("x1", point1.x)
@@ -243,7 +249,7 @@ class GaugeBoard {
     }
 
     //具体的绘制不通颜色区域的执行的方法
-    drawColor () {
+    drawColor() {
         for (let i in this.config.yellowRange) {
             this.drawBand(this.config.yellowRange[i].from, this.config.yellowRange[i].to, "#FF9900")
         }

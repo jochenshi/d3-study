@@ -20,16 +20,23 @@ class StackBar {
     //传入的数据更新时的处理
     update (data) {
         data = [
-            {name: "A", "tim": 20, "nancy": 10},
-            {name: "B", "tom": 22, "tim": 10, "nancy": 30},
-            {name: "C", "tom": 32, "tim": 10, "nancy": 11},
-            {name: "D", "tom": 22, "tim": 10, "nancy": 21},
+            {name: "B", "tom": Math.random() * 100, "tim": Math.random() * 100, "nancy": Math.random() * 100, "aa": Math.random() * 100},
+            {name: "C", "tom": Math.random() * 100, "tim": Math.random() * 100, "nancy": Math.random() * 100, "aa": Math.random() * 100},
+            {name: "D", "tom": Math.random() * 100, "tim": Math.random() * 100, "nancy": Math.random() * 100, "aa": Math.random() * 100},
+            {name: "E", "tom": Math.random() * 100, "tim": Math.random() * 100, "nancy": Math.random() * 100, "aa": Math.random() * 100},
+            {name: "F", "tom": Math.random() * 100, "tim": Math.random() * 100, "nancy": Math.random() * 100, "aa": Math.random() * 100},
+            {name: "G", "tom": Math.random() * 100, "tim": Math.random() * 100, "nancy": Math.random() * 100, "aa": Math.random() * 100},
         ];
         this.handleData(data);
         this.initAxis();
         this.updateAxis();
         this.draw();
+    }
 
+    handleUpdata() {
+        setInterval(() => {
+            this.update()
+        }, 3000)
     }
 
     _updateAxisX () {
@@ -52,7 +59,11 @@ class StackBar {
             }
             this.legends = Array.from(new Set(legends));
             this.keys = aKeys;
-            this.data = d3.stack().keys(this.legends)(data);
+            this.data = d3.stack().keys(this.legends)
+                .value((d, k) => {
+                    return d[k] === undefined ? 0 : d[k];
+                })(data);
+            console.log(this.data)
         }
     }
 
@@ -138,13 +149,19 @@ class StackBar {
         let gArea = this.mainContent.selectAll(".sGroups")
             .data(this.data);
 
+        console.log("first", gArea);
+
         //新增的g
         let enArea = gArea.enter()
             .append("g")
             .attr("class", "sGroups")
             .attr("fill", (d, i) => { return this.color(this.legends.indexOf(d.key))});
 
-        let inRect = gArea.selectAll(".bar_rect")
+        let allArea = this.mainContent.selectAll(".sGroups");
+
+        console.log("second", allArea);
+
+        let inRect = allArea.selectAll(".bar_rect")
             .data((d) => {
                 console.log(d);
                 return d
@@ -153,6 +170,8 @@ class StackBar {
             .append("rect")
             .attr("class", "bar_rect");
 
+        let allRect = allArea.selectAll(".bar_rect");
+
         newRect.attr("x", (d) => {
             return (this.xAxis(d.data.name) + this.xAxis.bandwidth()/2 - this.config.barWidth/2)
             })
@@ -160,21 +179,16 @@ class StackBar {
                 return this.height
             })
             .attr("height", 0)
+            .attr("width", this.config.barWidth)
             .transition()
+            .delay(1000)
             .duration(1000)
             .attr("y", (d) => {
-                if (Number.isNaN(d[1])) {
-                    return 0
-                } else {
-                    return this.yAxis(d[1])
-                }
+                console.log(d);
+                return this.yAxis(d[1])
             })
             .attr("height", (d, i, data) => {
-                if (Number.isNaN(d[1])) {
-                    return 0
-                } else {
-                    return this.yAxis(d[0]) - this.yAxis(d[1])
-                }
+                return this.yAxis(d[0]) - this.yAxis(d[1])
             });
 
         gArea.exit().remove();
@@ -187,19 +201,10 @@ class StackBar {
                 return (this.xAxis(d.data.name) + this.xAxis.bandwidth()/2 - this.config.barWidth/2)
             })
             .attr("y", (d) => {
-
-                if (Number.isNaN(d[1])) {
-                    return 0
-                } else {
-                    return this.yAxis(d[1])
-                }
+                return this.yAxis(d[1])
             })
             .attr("height", (d, i, data) => {
-                if (Number.isNaN(d[1])) {
-                    return 0
-                } else {
-                    return this.yAxis(d[0]) - this.yAxis(d[1])
-                }
+                return this.yAxis(d[0]) - this.yAxis(d[1])
             });
 
     }
@@ -235,18 +240,10 @@ class StackBar {
             .transition()
             .duration(1000)
             .attr("y", (d) => {
-                if (Number.isNaN(d[1])) {
-                    return 0
-                } else {
-                    return this.yAxis(d[1])
-                }
+                return this.yAxis(d[1])
             })
             .attr("height", (d, i, data) => {
-                if (Number.isNaN(d[1])) {
-                    return 0
-                } else {
-                    return this.yAxis(d[0]) - this.yAxis(d[1])
-                }
+                return this.yAxis(d[0]) - this.yAxis(d[1])
             })
             .attr("width", this.config.barWidth)
     }

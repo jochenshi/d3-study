@@ -15142,14 +15142,16 @@ function none$1(series, order) {
   }
 }
 
+//复制数组的内容到一个新的数组
 function none$2(series) {
   var n = series.length, o = new Array(n);
   while (--n >= 0) o[n] = n;
   return o;
 }
 
+//返回指定的d中的指定的key值的内容
 function stackValue(d, key) {
-  return d[key];
+    return d[key];
 }
 
 function stack() {
