@@ -156,8 +156,8 @@ class TrendChart{
             .attr("stroke", d => {
                 console.log(this.judgePosition(d.from.position, d.to.position, this.getControlPoint(d.from.position, d.to.position)))
                 return this.judgePosition(d.from.position, d.to.position, this.getControlPoint(d.from.position, d.to.position)) ?
-                    "url(#grad-reserve)" :
-                    "url(#grad)"
+                    "url(#grad)" :
+                    "url(#grad-reserve)"
             })
             .attr("fill", "none")
             .attr("stroke-width", 4);
@@ -186,10 +186,16 @@ class TrendChart{
         return path;
     }
 
-    judgePosition(point1, point2, judge) {
-        console.log((judge[1] - point1[1])/(judge[0] - [point1[0]]));
-        console.log((point1[1] - point2[1])/(point1[0] - point2[0]));
-        return ((judge[1] - point1[1])/(judge[0] - [point1[0]]) < (point1[1] - point2[1])/(point1[0] - point2[0]))
+
+    //true在下方, false在上方
+    judgePosition(start, end, judge) {
+        if (start[0] > end[0]) {
+            return (start[1] - end[1])*(judge[0] - start[0]) > (start[0] - end[0])*(judge[1] - start[1])
+        } else if (start[0] < end[0]) {
+            return (start[1] - end[1])*(judge[0] - start[0]) < (start[0] - end[0])*(judge[1] - start[1])
+        } else {
+            return end[1] > start[1]
+        }
     }
 
     generateTest() {
@@ -313,21 +319,21 @@ class TrendChart{
             .append("stop")
             .attr("offset", d => {
                 if (d === 0) {
-                    return "100%"
+                    return "0%"
                 } else if (d === 0.7) {
                     return "10%"
                 } else {
-                    return "0"
+                    return "100%"
                 }
             })
             .attr("stop-color", "red")
             .attr("stop-opacity", d => {
                 if (d === 0) {
-                    return 0.05
+                    return 1
                 } else if (d === 0.7) {
                     return 0.6
                 } else {
-                    return 1
+                    return 0.05
                 }
                 //return d === 0 ? 1 : 0.3
             });
