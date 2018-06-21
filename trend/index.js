@@ -4,13 +4,18 @@ class TrendChart{
         let defaultConfig = {};
         this.config = Object.assign({}, defaultConfig, configs);
         this.generateContainer();
-        this.generateGradient();
         this.setupDefault();
         /*this.generateGradient();
         this.generateTest();*/
     }
 
     setupDefault() {
+        this.color = [
+            "#66ff00",
+            "#ffff00",
+            "#3399cc",
+            "#ff0000"
+        ];
         this.data = [
             {
                 from: {
@@ -20,7 +25,10 @@ class TrendChart{
                 to: {
                     name: "placeB",
                     position: [500, 200]
-                }
+                },
+                value: 10,
+                level: 1,
+                width: 3
             },
             {
                 from: {
@@ -30,7 +38,10 @@ class TrendChart{
                 to: {
                     name: "placeC",
                     position: [200, 400]
-                }
+                },
+                value: 20,
+                level: 2,
+                width: 5
             },
             {
                 from: {
@@ -40,7 +51,10 @@ class TrendChart{
                 to: {
                     name: "placeA",
                     position: [30, 50]
-                }
+                },
+                value: 30,
+                level: 3,
+                width: 7
             },
             {
                 from: {
@@ -50,7 +64,10 @@ class TrendChart{
                 to: {
                     name: "placeA",
                     position: [30, 50]
-                }
+                },
+                value: 40,
+                level: 4,
+                width: 9
             },
             {
                 from: {
@@ -60,7 +77,10 @@ class TrendChart{
                 to: {
                     name: "placeC",
                     position: [200, 400]
-                }
+                },
+                value: 20,
+                level: 2,
+                width: 5
             },
             {
                 from: {
@@ -70,9 +90,13 @@ class TrendChart{
                 to: {
                     name: "placeB",
                     position: [500, 200]
-                }
+                },
+                value: 30,
+                level: 3,
+                width: 7
             }
         ];
+        this.generateGradient();
         this.getAllPoints();
         this.generatePoints();
         this.generateLine();
@@ -98,8 +122,11 @@ class TrendChart{
         for (let i in tt) {
             res.push(tt[i])
         }
+        console.log(tt)
         this.handleData = res;
-        console.log(res);
+
+        //处理数据的等级
+
     }
 
     generatePoints() {
@@ -110,6 +137,7 @@ class TrendChart{
             .attr("class", "main-point")
             .attr("cx", d => d.position[0])
             .attr("cy", d => d.position[1])
+            .attr("fill", "white")
             .attr("r", 3)
     }
 
@@ -139,6 +167,11 @@ class TrendChart{
         this.lineWrapperAll = this.lineArea.selectAll(".line-area")
             .data(this.data);
 
+        /*this.lineArea.append("rect")
+            .attr("width", 500)
+            .attr("height", 500)
+            .attr("fill", "url(#grad)");*/
+
         this.newWrapper = this.lineWrapperAll
             .enter()
             .append("g")
@@ -146,23 +179,100 @@ class TrendChart{
 
         this.newWrapper.append("path")
             .attr("class", "back-path")
-            .attr("opacity", 0.5)
+            .attr("id", (d, i) => "pathid_" + i)
+            .attr("stroke-opacity", 0.4)
             .attr("stroke", "#e3e3e3")
             .attr("fill", "none")
-            .attr("stroke-width", 3)
+            .attr("stroke-width", d => d.width)
             .attr("d", d => this.generatePath(d.from.position, d.to.position));
 
+
+        /*this.newWrapper.append("defs")
+            .append("mask")
+            .attr("id", (d, i) => {
+                return "mask1"
+            })
+            .append("circle")
+            .attr("cx", d => d.from.position[0])
+            .attr("cy", d => d.from.position)
+            .attr("r", 100)
+            .attr("fill", "url(#grad)");*/
+
+
         let newPath = this.newWrapper.append("path")
+            //.attr("stroke", "red")
             .attr("stroke", d => {
                 console.log(this.judgePosition(d.from.position, d.to.position, this.getControlPoint(d.from.position, d.to.position)))
                 return this.judgePosition(d.from.position, d.to.position, this.getControlPoint(d.from.position, d.to.position)) ?
-                    "url(#grad)" :
-                    "url(#grad-reserve)"
+                    "url(#linear-grad-" + d.level + ")" :
+                    "url(#linear-grad-reserve-" + d.level + ")"
             })
             .attr("fill", "none")
-            .attr("stroke-width", 4);
+            .attr("stroke-width", d => d.width);
 
-        newPath.transition()
+        this.moveLine(newPath);
+
+        /*this.newWrapper.append("circle")
+            .attr("class", "move-point")
+            .attr("fill", "#e3e3e3")
+            .attr("cx", d => d.from.position[0])
+            .attr("cy", d => d.from.position[1])
+            .attr("r", 5)
+            .transition()
+            .duration(4000)
+            .attrTween("transform", (d, i, ele) => {
+                let sibNode = ele[i].parentNode.querySelector('.back-path');
+                let total = sibNode.getTotalLength();
+                return (t) => {
+                    let aa = sibNode.getPointAtLength(t * total);
+                    return "translate(" + (aa.x - d.from.position[0]) + "," + (aa.y - d.from.position[1]) + ")"
+                }
+            })*/
+
+        let cc = this.newWrapper.append("circle")
+            .attr("class", "move-point")
+            .attr("fill", "#e3e3e3")
+            .attr("cx", d => d.from.position[0])
+            .attr("cy", d => d.from.position[1])
+            .attr("r", d => d.width);
+
+        this.moveCircle(cc)
+
+
+        /*this.newWrapper.append("circle")
+            .attr("class", "move-point")
+            .attr("r", 3)
+            .append("animateMotion")
+            .attr("dur", "4s")
+            .attr("repeatCount", "indefinite")
+            .append("mpath")
+            .attr("xlink:href", (d, i) => {
+                return "#pathid_" + i
+            })*/
+    }
+
+    //移动圆点
+    moveCircle(target) {
+        target
+            .transition()
+            .duration(4000)
+            .attrTween("transform", (d, i, ele) => {
+                let sibNode = ele[i].parentNode.querySelector('.back-path');
+                let total = sibNode.getTotalLength();
+                return (t) => {
+                    let aa = sibNode.getPointAtLength(t * total);
+                    return "translate(" + (aa.x - d.from.position[0]) + "," + (aa.y - d.from.position[1]) + ")"
+                }
+            })
+            .on("end", () => {
+                this.moveCircle(target)
+            })
+    }
+
+    //移动线条
+    moveLine(target) {
+        target
+            .transition()
             .duration(4000)
             .attrTween("d", (d, i, ele) => {
                 let sibNode = ele[i].parentNode.querySelector('.back-path');
@@ -174,8 +284,10 @@ class TrendChart{
                     let y = (1-t) * (+test[1]) + t * (+test[3]);
                     return "M" + +test[0] + "," + +test[1] + " Q" + x + "," + y + " " + aa.x + "," + aa.y
                 }
+            })
+            .on("end", () => {
+                this.moveLine(target)
             });
-
     }
 
     generatePath(start, end) {
@@ -276,13 +388,51 @@ class TrendChart{
 
     generateGradient() {
         this.gradient = this.container.append("g")
-            .attr("class", "gradient-area");
+            .attr("class", "gradient-area")
+            .append("defs");
 
-        this.gradient.append("radialGradient")
+        for (let i = 0; i < this.color.length; i++) {
+            this.gradient.append("linearGradient")
+                .attr("id", "linear-grad-" + (i+1))
+                .selectAll("stop")
+                .data([0, 0.7,  1])
+                .enter()
+                .append("stop")
+                .attr("offset", d => {
+                    return d === 0 ?
+                        "0%" :
+                        d === 1 ? "100%" : "70%"
+                })
+                .attr("stop-color", this.color[i])
+                .attr("stop-opacity", d => {
+                    return d === 0 ? 0 :
+                        d === 1 ? 1 : 0.2
+                });
+
+            this.gradient.append("linearGradient")
+                .attr("id", "linear-grad-reserve-"  + (i+1))
+                .selectAll("stop")
+                .data([0, 0.7,  1])
+                .enter()
+                .append("stop")
+                .attr("offset", d => {
+                    return d === 0 ?
+                        "0%" :
+                        d === 1 ? "100%" : "30%"
+                })
+                .attr("stop-color", this.color[i])
+                .attr("stop-opacity", d => {
+                    return d === 0 ? 1 :
+                        d === 1 ? 0 : 0.2
+                });
+        }
+
+
+        /*this.gradient.append("radialGradient")
             .attr("id", "grad")
-            .attr("cx", 1)
-            .attr("cy", 1)
-            .attr("r", 1)
+            .attr("cx", "50%")
+            .attr("cy", "50%")
+            .attr("r", "50%")
             .selectAll("stop")
             .data([0, 0.7, 1])
             .enter()
@@ -336,7 +486,7 @@ class TrendChart{
                     return 0.05
                 }
                 //return d === 0 ? 1 : 0.3
-            });
+            });*/
 
     }
 }

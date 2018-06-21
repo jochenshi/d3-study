@@ -49,6 +49,36 @@ class LineChart{
                     x: 'G',
                     y: '6'
                 }
+            ],
+            [
+                {
+                    x: 'A',
+                    y: '20'
+                },
+                {
+                    x: 'B',
+                    y: '25'
+                },
+                {
+                    x: 'C',
+                    y: '35'
+                },
+                {
+                    x: 'D',
+                    y: '15'
+                },
+                {
+                    x: 'E',
+                    y: '10'
+                },
+                {
+                    x: 'F',
+                    y: '20'
+                },
+                {
+                    x: 'G',
+                    y: '46'
+                }
             ]
         ];
         this.width = this.config.width - this.config.margin.right - this.config.margin.left;
@@ -104,6 +134,7 @@ class LineChart{
     //绘制折现的路径的方法
     generateLine() {
         let line = d3.line()
+            .curve(d3.curveCatmullRom)
             .x(d => {
                 console.log(d);
                 console.log(this.xRange.bandwidth(), this.xRange(d.x));
@@ -161,8 +192,10 @@ class LineChart{
 
         newTrans.select("path")
             .on("end", (d, i, tar) => {
-                console.log(tar[0]);
-                tar[0].style.clipPath = "url(#line-clip)"
+                tar.map(val => {
+                    d3.select(val).style("clip-path","url(#line-clip)")
+                });
+
             })
 
     }

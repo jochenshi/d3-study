@@ -5,16 +5,16 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>trend</title>
+    <title>document</title>
     <script src="../d3.js"></script>
-    <script src="index.js"></script>
 </head>
 <body>
-<div class="trend-chart" style="border: 1px solid #e3e3e3;background-color: black">
-    <svg style="width: 600px; height: 500px;"></svg>
+<div class="wrapper" style="border: 1px solid #e3e3e3">
+
 </div>
 </body>
+<script src="index.js"></script>
 <script>
-    window.object = new TrendChart(".trend-chart svg")
+    let object = new CubePie(".wrapper", {})
 </script>
 </html>
